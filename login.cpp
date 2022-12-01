@@ -11,6 +11,8 @@
 #include <iostream>
 #include <fstream>
 #include "hashtbl.cpp"
+#include <iostream>
+#include <ctime> // used to work with date and time
 
 using namespace std;
 
@@ -64,6 +66,10 @@ int main()
         std::cout << "Faild to open" << '\n';
     }
 
+    // create sign in file
+    //  Create and open a text file
+    ofstream MyFile("signIn.txt");
+
     //*********************************************************
     // Step 2: Read in file
     //*********************************************************
@@ -100,20 +106,40 @@ int main()
         cout << "User is in table";
         cout << "\nPassword: ";
         cin >> pass;
-
+        int count = 0;
         //**add lines here to compare retrieved user password to
-        if (tempPass.password == pass)
+        while (tempPass.password != pass && count <= 2)
         {
-            cout << "Login succesful";
-        }
-        else
-        {
+            if (count == 2)
+            {
+                cout << "\nAccount is locked";
+                exit(1);
+            }
             cout << "Login unsuccesful!!";
-            cout << "\nLogin:";
+            time_t t;      // t passed as argument in function time()
+            struct tm *tt; // decalring variable for localtime()
+            time(&t);      // passing argument to time()
+            tt = localtime(&t);
+            count++;
+            MyFile << "\n"
+                   << name << " had unsuccesful login attempt " << asctime(tt) << endl;
+            cout << "\nPassword:";
+            cin >> pass;
         }
+        cout << "Login succesful";
+        time_t t;      // t passed as argument in function time()
+        struct tm *tt; // decalring variable for localtime()
+        time(&t);      // passing argument to time()
+        tt = localtime(&t);
+        MyFile << "\n"
+               << name << " logged in succesfully " << asctime(tt) << endl;
+
         //**input password and print "Authentication failure"
         //**or "Authentication successful"
     }
+
+    // Close the file
+    MyFile.close();
 
     cout << endl;
     return 0;
